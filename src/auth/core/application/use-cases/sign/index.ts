@@ -1,14 +1,19 @@
+import { JwtModule } from '@nestjs/jwt';
 import { UserDto } from 'src/auth/dto/user/user.dto';
 import { UserRepository } from 'src/auth/infra/repository/user.repository';
 
 export class SignUseCase {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtModule,
+  ) {}
 
   async execute(phoneNumber: string, password: string): Promise<UserDto> {
     const user = await this.userRepository.findByPhoneNumber(phoneNumber);
     if (!user || !this.verifyPassword(password, user.passwordHash)) {
       throw new Error('Invalid credentials');
     }
+
     return {
       id: user.id,
       phoneNumber: user.phoneNumber,
