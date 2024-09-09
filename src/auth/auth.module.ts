@@ -14,11 +14,12 @@ import { AuthService } from './infra/service/auth.service';
     JwtModule.registerAsync({
       useFactory: () => ({
         secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '1d' },
+        signOptions: { expiresIn: '2d' },
       }),
     }),
   ],
   controllers: [AuthController],
+
   providers: [
     {
       provide: 'UserRepositoryProvider',
