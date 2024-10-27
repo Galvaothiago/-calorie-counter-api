@@ -6,6 +6,8 @@ import { UserRepository } from '../repository/user.repository';
 import { UnauthorizedError } from '../exceptions/unauthorized.exception';
 import { UserDto } from 'src/auth/dto/user/user.dto';
 import { SignDto } from 'src/auth/core/domain/entities/sign.dto';
+import { IUserRepository } from 'src/auth/core/repositories/user.repository.interface';
+import { User } from 'src/auth/core/domain/entities/user.entity';
 
 interface PayloadProp {
   sub: string;
@@ -20,8 +22,8 @@ export interface LoginResponse {
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('UserRepositoryProvider')
-    private readonly userRepository: UserRepository,
+    @Inject('IUserRepository')
+    private readonly userRepository: IUserRepository<User>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -34,7 +36,7 @@ export class AuthService {
       if (isValidPassword) {
         return {
           ...user,
-          password: undefined,
+          passwordHash: undefined,
         };
       }
     }

@@ -8,15 +8,16 @@ import { IsPublic } from 'src/auth/decorators/endpoint-public.decorator';
 import { UserDto } from 'src/auth/dto/user/user.dto';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guards';
 import { AuthService } from '../service/auth.service';
+import { SignUpUseCase } from 'src/auth/core/application/use-cases/sign-up';
 
+@IsPublic()
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly signUseCase: SignUseCase,
+    private readonly signupUseCase: SignUpUseCase,
     private readonly authService: AuthService,
   ) {}
 
-  @IsPublic()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Body() dto: SignDto) {
@@ -24,14 +25,12 @@ export class AuthController {
   }
 
   @Post('signup')
-  async signUp(@Body() dto: SignUpDto): Promise<UserDto> {
-    // return this.signUpUseCase.execute(dto.phoneNumber, dto.password);
-    return null;
+  async signUp(@Body() dto: UserDto): Promise<UserDto> {
+    return this.signupUseCase.execute(dto.phoneNumber, dto.password);
   }
 
   @Post('recover-password')
   async recoverPassword(@Body() dto: RecoverPasswordDto): Promise<void> {
-    // return this.recoverPasswordUseCase.execute(dto.phoneNumber);
     return null;
   }
 }

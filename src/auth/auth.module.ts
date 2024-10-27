@@ -5,16 +5,23 @@ import { SignUseCase } from './core/application/use-cases/sign';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AuthService } from './infra/service/auth.service';
+import { TypeormUserRepository } from './infra/database/typeorm/repositories/typeorm-user.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeormUserEntity } from './infra/database/typeorm/entities/typeorm-user.entity';
+import { TypeormModule } from './infra/database/typeorm/typeorm.module';
+import { LocalStrategy } from './strategies/local.strategy';
+import { SignUpUseCase } from './core/application/use-cases/sign-up';
 
 @Module({
   imports: [
+    TypeormModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     JwtModule.registerAsync({
       useFactory: () => ({
         secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '2d' },
+        signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
       }),
     }),
   ],
@@ -22,11 +29,14 @@ import { AuthService } from './infra/service/auth.service';
 
   providers: [
     {
-      provide: 'UserRepositoryProvider',
-      useClass: UserRepository,
+      provide: 'IUserRepository',
+      useClass: TypeormUserRepository,
     },
     SignUseCase,
+    SignUpUseCase,
     AuthService,
+    LocalStrategy,
   ],
+  exports: ['IUserRepository'],
 })
 export class AuthModule {}
